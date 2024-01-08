@@ -1,6 +1,7 @@
 //Stina Hedman
 //NET23
 
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MinimalAPI.Data;
 using MinimalAPI.Models;
@@ -24,7 +25,7 @@ namespace MinimalAPI
             //GET all users in the system
             app.MapGet("/users", (ApplicationContext context) =>
             {
-                return Results.Json(context.Users.Select(u => new {u.FirstName, u.LastName, u.PhoneNumber, u.Id}).ToArray());
+                return Results.Json(context.Users.Select(u => new { u.FirstName, u.LastName, u.PhoneNumber, u.Id }).ToArray());
             });
 
             //GET all interests of a specific user
@@ -33,7 +34,7 @@ namespace MinimalAPI
                 return Results.Json(context.Users
                     .Where(u => u.Id == id)
                     .SelectMany(u => u.Interests)
-                    .Select(i => new {i.Name, i.Description, i.Id })
+                    .Select(i => new { i.Name, i.Description, i.Id })
                     .ToArray());
             });
 
@@ -43,7 +44,7 @@ namespace MinimalAPI
                 return Results.Json(context.Users
                     .Where(u => u.Id == id)
                     .SelectMany(u => u.Webpages)
-                    .Select(i => new { i.Url, WebpageTopic =  i.Interest.Name , i.Id })
+                    .Select(i => new { i.Url, WebpageTopic = i.Interest.Name, i.Id })
                     .ToArray());
             });
 
@@ -65,12 +66,17 @@ namespace MinimalAPI
 
             });
 
-            //POST new webpage
-            app.MapPost("/users/{id}/webpages", (ApplicationContext context, string URL, string interestName, int id) =>
+            app.MapPost("/users/{id}/webpages", (ApplicationContext context, [FromBody] WebpageInfo webpageinfo, int id) =>
             {
-                var user = context.Users.First(u => u.Id == id);
-                var interest = user.Interests.FirstOrDefault(i => i.Name == interestName);
-                
+                var user = context.Users.FirstOrDefault(u => u.Id == id);
+
+                //explicit load of interests 
+                context.Entry(user)
+                    .Collection(u => u.Interests)
+                    .Load();                
+
+                var interest = user.Interests.FirstOrDefault(i => i.Name == webpageinfo.MyInterest);
+
                 if (interest == null)
                 {
                     return Results.BadRequest(interest);
@@ -78,9 +84,10 @@ namespace MinimalAPI
 
                 user.Webpages.Add(new Webpage()
                 {
-                    Url = URL,
+                    Url = webpageinfo.Url,
                     Interest = interest
                 });
+
 
                 context.SaveChanges();
                 return Results.StatusCode((int)HttpStatusCode.Created);
@@ -88,13 +95,15 @@ namespace MinimalAPI
             });
 
             //POST new interest
-            app.MapPost("/users/{id}/interests",(ApplicationContext context, String interest, int id) => 
+            app.MapPost("/users/{id}/interests", async (ApplicationContext context, [FromBody] InterestInfo interestInfo, [FromRoute] int id) =>
             {
                 var user = context.Users.First(u => u.Id == id);
-                user.Interests.Add(context.Interests.First(i => i.Name == interest));
+                user.Interests.Add(context.Interests.First(i => i.Name == interestInfo.Interest.ToString()));
+
                 context.SaveChanges();
                 return Results.StatusCode((int)HttpStatusCode.OK);
             });
+
 
             app.Run();
         }
