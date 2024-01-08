@@ -1,11 +1,11 @@
 # MinimalAPI
 ----------------------------------------------------------------------------------------
-##ER-Schema##
+## ER-Schema
 
 ![ERdiagram](https://github.com/StinanH/MinimalAPI/assets/146299553/354dc248-d7ec-4104-8600-5e28beb023d3)
 
 ----------------------------------------------------------------------------------------
-##UML-Diagram##
+## UML-Diagram
 
 ![UML-Diagram (1)](https://github.com/StinanH/MinimalAPI/assets/146299553/6d6e55ca-1846-43c8-bc92-74fe8ed2223b)
 
