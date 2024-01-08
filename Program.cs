@@ -18,7 +18,18 @@ namespace MinimalAPI
             string connectionString = builder.Configuration.GetConnectionString("ApplicationContext");
 
             builder.Services.AddDbContext<ApplicationContext>(options => options.UseSqlServer(connectionString));
+            
+            //----------------------SWAGGER---------
+            builder.Services.AddEndpointsApiExplorer();
+            builder.Services.AddSwaggerGen();
+            //----------------------SWAGGER---------
+
             var app = builder.Build();
+
+            //----------------------SWAGGER---------
+            app.MapSwagger();
+            app.UseSwaggerUI();
+            //----------------------SWAGGER---------
 
             app.MapGet("/", () => "Welcome to the database!");
 
