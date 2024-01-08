@@ -1,5 +1,5 @@
 # MinimalAPI
-----------------------------------------------------------------------------------------
+
 ## ER-Schema
 
 ![ERdiagram](https://github.com/StinanH/MinimalAPI/assets/146299553/354dc248-d7ec-4104-8600-5e28beb023d3)
